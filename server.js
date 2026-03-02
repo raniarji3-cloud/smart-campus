@@ -33,16 +33,22 @@ app.get("/", (req, res) => {
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 
+const mysql = require("mysql2");
+
 const db = mysql.createConnection({
-  host: "127.0.0.1",
-  user: "root",
-  password: "",
-  database: "smart_campus"
+  host: process.env.MYSQLHOST,
+  user: process.env.MYSQLUSER,
+  password: process.env.MYSQLPASSWORD,
+  database: process.env.MYSQLDATABASE,
+  port: process.env.MYSQLPORT
 });
 
-db.connect(err => {
-  if (err) throw err;
-  console.log("MySQL Connected");
+db.connect((err) => {
+  if (err) {
+    console.error("Database connection failed:", err);
+    return;
+  }
+  console.log("Connected to Railway MySQL");
 });
 
 // Register
