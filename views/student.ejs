@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="navbar">
+  <div>Smart Campus - Student</div>
+  <div>
+    Welcome <%= user.name %> |
+    <a href="/logout" style="color:white;">Logout</a>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="card">
+    <h3>Attendance Summary</h3>
+    <p>Total Classes: <%= total %></p>
+    <p>Present: <%= presentCount %></p>
+    <p>Attendance Percentage: <%= percentage %>%</p>
+  </div>
+
+  <div class="card">
+    <h3>Attendance Records</h3>
+    <% attendance.forEach(a => { %>
+      <p><%= a.date %> - <%= a.status %></p>
+    <% }) %>
+  </div>
+  
+  <div class="card">
+    <h3>Announcements</h3>
+    <% announcements.forEach(a => { %>
+      <p><strong><%= a.title %></strong> - <%= a.message %></p>
+    <% }) %>
+  </div>
+  <h3>Face Attendance</h3>
+  <button onclick="registerFace()">Register Face</button>
+  <button onclick="markAttendance()">Mark Attendance</button>
+
+  <video id="video" width="400" autoplay></video>
+  <p id="result"></p>
+
+  <script src="/script.js"></script>
+
+  <script>
+    const video = document.getElementById("video");
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => {
+      video.srcObject = stream;
+    })
+    .catch(err => {
+      console.log("Camera error:", err);
+    });
+</script>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Faculty Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="navbar">
+  <div>Smart Campus - Faculty</div>
+  <div>
+    Welcome <%= user.name %> |
+    <a href="/logout" style="color:white;">Logout</a>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="card">
+    <h3>Add Announcement</h3>
+    <form action="/add-announcement" method="POST">
+      <input type="text" name="title" placeholder="Title" required>
+      <input type="text" name="message" placeholder="Message" required>
+      <button type="submit">Add</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>All Announcements</h3>
+    <% announcements.forEach(a => { %>
+      <div style="margin-bottom:10px;">
+        <strong><%= a.title %></strong> - <%= a.message %>
+
+        <form action="/delete-announcement/<%= a.id %>" method="POST">
+          <button type="submit">Delete</button>
+        </form>
+      </div>
+    <% }) %>
+    
+  </div>
+
+  <div class="card">
+    <h3>Mark Attendance</h3>
+    <form action="/mark-attendance" method="POST">
+      <input type="email" name="student_email" placeholder="Student Email" required>
+      <input type="date" name="date" required>
+      <select name="status" required>
+        <option value="Present">Present</option>
+        <option value="Absent">Absent</option>
+      </select>
+      <button type="submit">Mark</button>
+    </form>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        video {
+            border: 2px solid #333;
+            border-radius: 8px;
+        }
+        button {
+            margin: 5px;
+            padding: 8px 12px;
+        }
+        #result {
+            margin-top: 10px;
+            font-weight: bold;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Dashboard</h2>
+<div id="welcome"></div>
+
+<h2>Face Attendance</h2>
+<button onclick="registerFace()">Register Face</button>
+<button onclick="markAttendance()">Mark Attendance</button>
+<br>
+<video id="video" width="400" autoplay playsinline></video>
+<p id="result"></p>
+
+<h3>Attendance</h3>
+<div id="attendance"></div>
+
+<h3>Announcements</h3>
+<div id="announcements"></div>
+
+<script src="/script.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", loadDashboard);
+</script>
+
+</body>
+</html>
