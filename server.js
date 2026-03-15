@@ -21,7 +21,7 @@ app.use(session({
     sameSite: "lax",
     maxAge: 1000 * 60 * 60
   }
-}));PORT
+}));
 
 app.get("/test-route", (req, res) => {
   res.send("Route Working");
@@ -402,7 +402,7 @@ app.post("/register-face", async (req, res) => {
   }
 });
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log("Server running on port " + PORT);
 });
