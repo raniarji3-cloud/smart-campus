@@ -3,4 +3,4 @@ flask-cors
 numpy
 opencv-python
 face-recognition
-gunicorn
+pillow

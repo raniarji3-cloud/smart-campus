@@ -17,10 +17,12 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: false, // keep false for localhost
-    maxAge: 1000 * 60 * 60 // 1 hour
+    secure: false,
+    sameSite: "lax",
+    maxAge: 1000 * 60 * 60
   }
-}));
+}));PORT
+
 app.get("/test-route", (req, res) => {
   res.send("Route Working");
 });
@@ -400,8 +402,7 @@ app.post("/register-face", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
-
+const PORT = 5000;
 app.listen(PORT, () => {
   console.log("Server running on port " + PORT);
 });
