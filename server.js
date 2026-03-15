@@ -35,7 +35,7 @@ app.get("/", (req, res) => {
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 
-const mysql = require("mysql2");
+
 
 const db = mysql.createConnection({
   host: process.env.MYSQLHOST,
