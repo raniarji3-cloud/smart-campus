@@ -48,6 +48,50 @@ A full-stack Smart Campus Management System designed to automate and manage camp
 
 ---
 
+# Installation
+
+## Install Node Modules
+
+```bash
+npm install
+```
+
+## Create Virtual Environment
+
+```bash
+python -m venv faceenv
+```
+
+## Activate Virtual Environment (Windows)
+
+```bash
+faceenv\Scripts\activate
+```
+
+## Install Python Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+# Run Project
+
+## Start Node Server
+
+```bash
+node app.js
+```
+
+## Start Face Recognition Server
+
+```bash
+python face_server.py
+```
+
+---
+
 # Project Structure
 
 ```bash
@@ -59,10 +103,18 @@ smart-campus/
 ├── uploads/
 ├── models/
 ├── middleware/
-├── node_modules/
-├── faceenv/
 ├── face_server.py
 ├── app.js
 ├── package.json
 ├── requirements.txt
 └── README.md
+```
+
+---
+
+# Future Improvements
+- Real-time Notifications
+- Mobile Application
+- AI-based Analytics
+- Cloud Deployment
+- Advanced Security Features
