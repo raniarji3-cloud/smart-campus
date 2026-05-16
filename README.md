@@ -50,6 +50,12 @@ A full-stack Smart Campus Management System designed to automate and manage camp
 
 # Installation
 
+## Clone Repository
+---bash
+git clone https://github.com/raniarji3-cloud/smart-campus.git
+cd smart-campus
+---
+
 ## Install Node Modules
 
 ```bash
