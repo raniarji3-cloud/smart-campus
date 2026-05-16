@@ -1,7 +1,68 @@
 // Replace with your actual Ngrok link when deployed
 const baseURL = ""; 
+const collegeLat = 17.3850;
+const collegeLng = 78.4867;
+
+const ALLOWED_RADIUS = 200;
 
 let videoStream;
+function calculateDistance(lat1, lon1, lat2, lon2) {
+
+    const R = 6371e3;
+
+    const φ1 = lat1 * Math.PI/180;
+    const φ2 = lat2 * Math.PI/180;
+
+    const Δφ = (lat2-lat1) * Math.PI/180;
+    const Δλ = (lon2-lon1) * Math.PI/180;
+
+    const a =
+        Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+        Math.cos(φ1) * Math.cos(φ2) *
+        Math.sin(Δλ/2) * Math.sin(Δλ/2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+    return R * c;
+}
+async function verifyGeofence() {
+
+    return new Promise((resolve, reject) => {
+
+        navigator.geolocation.getCurrentPosition(
+
+            position => {
+
+                const userLat = position.coords.latitude;
+                const userLon = position.coords.longitude;
+
+                const distance = calculateDistance(
+                    userLat,
+                    userLon,
+                    collegeLat,
+                    collegeLng
+                );
+
+                console.log("Distance:", distance);
+
+                if(distance <= ALLOWED_RADIUS){
+                    resolve(true);
+                }
+                else{
+                    resolve(false);
+                }
+
+            },
+
+            error => {
+                reject(error);
+            }
+
+        );
+
+    });
+
+}
 
 // Initialize camera
 async function initCamera() {
@@ -34,50 +95,116 @@ function getCapturedImage() {
 
 // Register face
 async function registerFace() {
+
     const image = getCapturedImage();
-    const user = JSON.parse(localStorage.getItem("user"));
+
     const resultEl = document.getElementById("result");
 
-    if (!user || !user.id) {
-        alert("User not logged in");
-        return;
-    }
-
     resultEl.innerText = "Registering face...";
+
     try {
-        const response = await fetch(baseURL + "/register-face", {
+
+        const response = await fetch("/register-face", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({ image })
         });
+
         const data = await response.json();
+
         resultEl.innerText = data.message;
+
     } catch (err) {
+
         console.error(err);
-        resultEl.innerText = "Face registration failed!";
+
+        resultEl.innerText =
+            "Face registration failed!";
+
     }
+
 }
 
 // Mark attendance
 async function markAttendance() {
-    const image = getCapturedImage();
+
     const resultEl = document.getElementById("result");
 
-    resultEl.innerText = "Recognizing face...";
-    try {
-        const response = await fetch(baseURL + "/recognize-face", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image })
-        });
-        const data = await response.json();
-        resultEl.innerText = data.message;
-    } catch (err) {
-        console.error(err);
-        resultEl.innerText = "Face recognition failed!";
-    }
-}
+    resultEl.innerText = "Checking location...";
 
+    // CHECK LOCATION
+
+    navigator.geolocation.getCurrentPosition(async (position) => {
+
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        console.log("User Location:", latitude, longitude);
+
+        // YOUR COLLEGE LOCATION
+        const collegeLat = 17.3850;
+        const collegeLng = 78.4867;
+
+        // DISTANCE CHECK
+        const distance =
+            Math.sqrt(
+                Math.pow(latitude - collegeLat, 2) +
+                Math.pow(longitude - collegeLng, 2)
+            );
+
+        // GEOFENCE LIMIT
+        if (distance > 0.01) {
+
+            resultEl.innerText =
+                "❌ You are outside college campus";
+
+            return;
+        }
+
+        resultEl.innerText =
+            "✅ Location verified. Recognizing face...";
+
+        // FACE RECOGNITION
+
+        const image = getCapturedImage();
+
+        try {
+
+            const response = await fetch("/recognize-face", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ image })
+            });
+
+            const data = await response.json();
+
+            resultEl.innerText = data.message;
+
+        } catch (err) {
+
+            console.log(err);
+
+            resultEl.innerText =
+                "❌ Face recognition failed";
+
+        }
+
+    },
+
+    (error) => {
+
+        console.log(error);
+
+        resultEl.innerText =
+            "❌ Please allow location access";
+
+    });
+
+}
 // Load dashboard data
 function loadDashboard() {
     const user = JSON.parse(localStorage.getItem("user"));

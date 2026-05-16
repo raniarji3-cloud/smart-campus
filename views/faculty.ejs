@@ -1,58 +1,294 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Faculty Dashboard</title>
+
   <link rel="stylesheet" href="/style.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/feather-icons"></script>
 </head>
+
 <body>
 
-<div class="navbar">
-  <div>Smart Campus - Faculty</div>
-  <div>
-    Welcome <%= user.name %> |
-    <a href="/logout" style="color:white;">Logout</a>
-  </div>
-</div>
+<div class="dashboard">
 
-<div class="container">
+  <!-- SIDEBAR -->
 
-  <div class="card">
-    <h3>Add Announcement</h3>
-    <form action="/add-announcement" method="POST">
-      <input type="text" name="title" placeholder="Title" required>
-      <input type="text" name="message" placeholder="Message" required>
-      <button type="submit">Add</button>
-    </form>
-  </div>
+  <div class="sidebar">
 
-  <div class="card">
-    <h3>All Announcements</h3>
-    <% announcements.forEach(a => { %>
-      <div style="margin-bottom:10px;">
-        <strong><%= a.title %></strong> - <%= a.message %>
+    <div>
 
-        <form action="/delete-announcement/<%= a.id %>" method="POST">
-          <button type="submit">Delete</button>
-        </form>
+      <div class="logo">
+        Faculty Panel
       </div>
-    <% }) %>
-    
+
+      <ul class="menu">
+
+        <li class="active" onclick="showSection('dashboard-section', this)">
+          <i data-feather="home"></i>
+          Dashboard
+        </li>
+
+        <li onclick="showSection('announcement-section', this)">
+          <i data-feather="bell"></i>
+          Announcements
+        </li>
+
+        <li onclick="showSection('attendance-section', this)">
+          <i data-feather="check-circle"></i>
+          Attendance
+        </li>
+
+        <li onclick="showSection('students-section', this)">
+          <i data-feather="users"></i>
+          Students
+        </li>
+
+      </ul>
+
+    </div>
+
+    <div class="logout-btn" onclick="window.location.href='/logout'">
+      <i data-feather="log-out"></i>
+      Logout
+    </div>
+
   </div>
 
-  <div class="card">
-    <h3>Mark Attendance</h3>
-    <form action="/mark-attendance" method="POST">
-      <input type="email" name="student_email" placeholder="Student Email" required>
-      <input type="date" name="date" required>
-      <select name="status" required>
-        <option value="Present">Present</option>
-        <option value="Absent">Absent</option>
-      </select>
-      <button type="submit">Mark</button>
-    </form>
+  <!-- MAIN -->
+
+  <div class="main">
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+      <div>
+
+        <h1>
+          Welcome, <%= user.name %> 👋
+        </h1>
+
+        <p class="subtitle">
+          Faculty Attendance Management System
+        </p>
+
+      </div>
+
+      <div class="profile-circle">
+        <%= user.name.charAt(0).toUpperCase() %>
+      </div>
+
+    </div>
+
+    <!-- DASHBOARD -->
+
+    <div id="dashboard-section" class="content-section active">
+
+      <div class="hero-card">
+
+        <div>
+
+          <h2>Faculty Smart Management</h2>
+
+          <p>
+            Manage announcements, attendance and monitor student activities using Smart Campus AI System.
+          </p>
+
+          <button class="hero-btn">
+            Faculty Access Active
+          </button>
+
+        </div>
+
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135789.png">
+
+      </div>
+
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <h3>Total Announcements</h3>
+          <h1><%= announcements.length %></h1>
+        </div>
+
+        <div class="stat-card">
+          <h3>Faculty Role</h3>
+          <h1>ACTIVE</h1>
+        </div>
+
+        <div class="stat-card">
+          <h3>Attendance System</h3>
+          <h1>ONLINE</h1>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ANNOUNCEMENT SECTION -->
+
+    <div id="announcement-section" class="content-section">
+
+      <div class="faculty-form">
+
+        <h2 style="margin-bottom:20px;">
+          Add Announcement
+        </h2>
+
+        <form action="/add-announcement" method="POST">
+
+          <input
+            type="text"
+            name="title"
+            placeholder="Enter Title"
+            required
+          >
+
+          <textarea
+            name="message"
+            placeholder="Enter Message"
+            required
+          ></textarea>
+
+          <button type="submit">
+            Publish Announcement
+          </button>
+
+        </form>
+
+      </div>
+
+      <div class="announcement-card">
+
+        <h2>All Announcements</h2>
+
+        <% announcements.forEach(a => { %>
+
+        <div class="announcement-item">
+
+          <div>
+
+            <h3><%= a.title %></h3>
+
+            <p><%= a.message %></p>
+
+          </div>
+
+          <form action="/delete-announcement/<%= a.id %>" method="POST">
+
+            <button class="hero-btn">
+              Delete
+            </button>
+
+          </form>
+
+        </div>
+
+        <% }) %>
+
+      </div>
+
+    </div>
+
+    <!-- ATTENDANCE SECTION -->
+
+    <div id="attendance-section" class="content-section">
+
+      <div class="faculty-form">
+
+        <h2 style="margin-bottom:20px;">
+          Manual Attendance
+        </h2>
+
+        <form action="/mark-attendance" method="POST">
+
+          <input
+            type="text"
+            name="student_id"
+            placeholder="Student ID"
+            required
+          >
+
+          <input
+            type="date"
+            name="date"
+            required
+          >
+
+          <select name="status">
+
+            <option value="Present">
+              Present
+            </option>
+
+            <option value="Absent">
+              Absent
+            </option>
+
+          </select>
+
+          <button type="submit">
+            Mark Attendance
+          </button>
+
+        </form>
+
+      </div>
+
+    </div>
+
+    <!-- STUDENTS SECTION -->
+
+    <div id="students-section" class="content-section">
+
+      <div class="profile-card">
+
+        <h2 style="margin-bottom:20px;">
+          Student Management
+        </h2>
+
+        <p>
+          Student management module will be added next.
+        </p>
+
+      </div>
+
+    </div>
+
   </div>
 
 </div>
+
+<script>
+
+feather.replace();
+
+function showSection(sectionId, element){
+
+  document.querySelectorAll(".content-section")
+  .forEach(section => {
+    section.classList.remove("active");
+  });
+
+  document.getElementById(sectionId)
+  .classList.add("active");
+
+  document.querySelectorAll(".menu li")
+  .forEach(item => {
+    item.classList.remove("active");
+  });
+
+  element.classList.add("active");
+}
+
+</script>
 
 </body>
 </html>

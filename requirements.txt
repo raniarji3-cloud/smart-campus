@@ -1,6 +1,7 @@
-flask
+Flask
 flask-cors
 numpy
-opencv-python
-face-recognition
-pillow
+opencv-python-headless
+face_recognition
+Pillow
+gunicorn

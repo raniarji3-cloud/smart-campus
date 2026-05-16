@@ -1,45 +1,248 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Campus Dashboard</title>
+
     <link rel="stylesheet" href="style.css">
-    <style>
-        video {
-            border: 2px solid #333;
-            border-radius: 8px;
-        }
-        button {
-            margin: 5px;
-            padding: 8px 12px;
-        }
-        #result {
-            margin-top: 10px;
-            font-weight: bold;
-            color: green;
-        }
-    </style>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://unpkg.com/feather-icons"></script>
 </head>
+
 <body>
 
-<h2>Dashboard</h2>
-<div id="welcome"></div>
+<div class="dashboard">
 
-<h2>Face Attendance</h2>
-<button onclick="registerFace()">Register Face</button>
-<button onclick="markAttendance()">Mark Attendance</button>
-<br>
-<video id="video" width="400" autoplay playsinline></video>
-<p id="result"></p>
+    <!-- SIDEBAR -->
 
-<h3>Attendance</h3>
-<div id="attendance"></div>
+    <div class="sidebar">
 
-<h3>Announcements</h3>
-<div id="announcements"></div>
+        <div class="logo-box">
+            <div class="logo-icon">🎓</div>
+            <h2>Smart Campus</h2>
+        </div>
+
+        <ul class="menu">
+
+            <li class="nav-btn active" data-section="dashboard-section">
+                <i data-feather="home"></i>
+                Dashboard
+            </li>
+
+            <li class="nav-btn" data-section="face-section">
+                <i data-feather="camera"></i>
+                Face Attendance
+            </li>
+
+            <li class="nav-btn" data-section="attendance-section">
+                <i data-feather="check-circle"></i>
+                Attendance
+            </li>
+
+            <li class="nav-btn" data-section="announcement-section">
+                <i data-feather="bell"></i>
+                Announcements
+            </li>
+
+            <li onclick="window.location.href='/logout'">
+                <i data-feather="log-out"></i>
+                Logout
+            </li>
+
+        </ul>
+
+    </div>
+
+    <!-- MAIN CONTENT -->
+
+    <div class="main-content">
+
+        <!-- TOPBAR -->
+
+        <div class="topbar">
+
+            <div>
+                <h1 id="welcome">Welcome Student 👋</h1>
+
+                <p class="subtitle">
+                    AI Smart Attendance Management System
+                </p>
+            </div>
+
+            <div class="profile">
+                R
+            </div>
+
+        </div>
+
+        <!-- DASHBOARD SECTION -->
+
+        <div id="dashboard-section" class="content-section">
+
+            <div class="hero-card">
+
+                <div>
+
+                    <h2>Smart Face Attendance</h2>
+
+                    <p>
+                        AI powered face recognition attendance
+                        with secure campus verification system.
+                    </p>
+
+                    <button class="hero-btn">
+                        Attendance Active
+                    </button>
+
+                </div>
+
+                <img src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png">
+
+            </div>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <h3>Total Classes</h3>
+                    <h1>1</h1>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Present Days</h3>
+                    <h1>1</h1>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Attendance %</h3>
+                    <h1 id="attendance">100%</h1>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- FACE SECTION -->
+
+        <div id="face-section" class="content-section">
+
+            <div class="camera-card">
+
+                <h2 style="margin-bottom:20px;">
+                    Face Attendance
+                </h2>
+
+                <video id="video" autoplay playsinline></video>
+
+                <div class="button-group">
+
+                    <button onclick="registerFace()">
+                        Register Face
+                    </button>
+
+                    <button onclick="markAttendance()">
+                        Mark Attendance
+                    </button>
+
+                </div>
+
+                <p id="result"></p>
+
+            </div>
+
+        </div>
+
+        <!-- ATTENDANCE SECTION -->
+
+        <div id="attendance-section" class="content-section">
+
+            <div class="table-card">
+
+                <h2 style="margin-bottom:20px;">
+                    Attendance Records
+                </h2>
+
+                <table>
+
+                    <tr>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+
+                    <tr>
+                        <td>16 May 2026</td>
+                        <td class="present">Present</td>
+                    </tr>
+
+                </table>
+
+            </div>
+
+        </div>
+
+        <!-- ANNOUNCEMENT SECTION -->
+
+        <div id="announcement-section" class="content-section">
+
+            <div class="announcement-card">
+
+                <h2 style="margin-bottom:20px;">
+                    Latest Announcements
+                </h2>
+
+                <div id="announcements"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 <script src="/script.js"></script>
+
 <script>
-    document.addEventListener("DOMContentLoaded", loadDashboard);
+
+feather.replace();
+
+const navButtons = document.querySelectorAll(".nav-btn");
+
+const sections = document.querySelectorAll(".content-section");
+
+sections.forEach(section => {
+    section.style.display = "none";
+});
+
+document.getElementById("dashboard-section").style.display = "block";
+
+navButtons.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        navButtons.forEach(btn => {
+            btn.classList.remove("active");
+        });
+
+        sections.forEach(section => {
+            section.style.display = "none";
+        });
+
+        button.classList.add("active");
+
+        const sectionId = button.getAttribute("data-section");
+
+        document.getElementById(sectionId).style.display = "block";
+
+    });
+
+});
+
+document.addEventListener("DOMContentLoaded", loadDashboard);
+
 </script>
 
 </body>

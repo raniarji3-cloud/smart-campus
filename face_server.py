@@ -8,71 +8,168 @@ import cv2
 app = Flask(__name__)
 CORS(app)
 
-# In-memory storage for simplicity
+# In-memory storage (for testing only)
 known_faces = {}
 
+# -----------------------------
+# SAFE IMAGE DECODER
+# -----------------------------
 def decode_image(image_data):
-    # Decode base64 image
-    image_bytes = base64.b64decode(image_data.split(",")[1])
-    np_arr = np.frombuffer(image_bytes, np.uint8)
-    frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-    return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    try:
+        if not image_data or "," not in image_data:
+            print("❌ Invalid image format")
+            return None
 
+        image_data = image_data.split(",")[1]
+        image_bytes = base64.b64decode(image_data)
+
+        np_arr = np.frombuffer(image_bytes, np.uint8)
+        frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
+        if frame is None:
+            print("❌ cv2 failed to decode image")
+            return None
+
+        return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+    except Exception as e:
+        print("❌ Decode error:", str(e))
+        return None
+
+
+# -----------------------------
+# REGISTER FACE
+# -----------------------------
 @app.route("/register_face", methods=["POST"])
 def register_face():
-    data = request.json
-    student_id = str(data.get("student_id"))
-    image = data.get("image")
 
-    if not student_id or not image:
-        return jsonify({"message": "Missing student_id or image"}), 400
+    try:
+        data = request.json
 
-    rgb_frame = decode_image(image)
-    encodings = face_recognition.face_encodings(rgb_frame)
+        student_id = str(data.get("student_id"))
+        image = data.get("image")
 
-    if len(encodings) == 0:
-        return jsonify({"message": "No face detected"}), 400
+        print("\n🔥 Register request received for ID:", student_id)
 
-    known_faces[student_id] = encodings[0]
-    print("Registered Student:", student_id)
-    print("Total Known Faces:", len(known_faces))
-    return jsonify({"message": "Face registered successfully"})
+        rgb_frame = decode_image(image)
+        cv2.imwrite("debug_face.jpg", cv2.cvtColor(rgb_frame, cv2.COLOR_RGB2BGR))
 
+        if rgb_frame is None:
+            return jsonify({
+                "success": False,
+                "message": "Image decode failed"
+            }), 400
+
+        # Detect face locations first
+        face_locations = face_recognition.face_locations(rgb_frame)
+
+        print("📍 Face locations:", face_locations)
+
+        if len(face_locations) == 0:
+            return jsonify({
+                "success": False,
+                "message": "No face detected. Move closer to camera."
+            }), 400
+
+        # Generate encodings
+        encodings = face_recognition.face_encodings(
+            rgb_frame,
+            face_locations
+        )
+
+        print("👀 Faces detected:", len(encodings))
+
+        encoding = encodings[0]
+
+        known_faces[student_id] = encoding
+
+        print("✅ Registered Student:", student_id)
+
+        return jsonify({
+            "success": True,
+            "message": "Face registered successfully"
+        })
+
+    except Exception as e:
+
+        print("❌ Register error:", str(e))
+
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+# -----------------------------
+# RECOGNIZE FACE
+# -----------------------------
 @app.route("/recognize_face", methods=["POST"])
 def recognize_face():
-    data = request.json
-    image = data.get("image")
 
-    if not image:
-        return jsonify({"status": "No image provided"}), 400
+    try:
+        data = request.json
 
-    rgb_frame = decode_image(image)
-    encodings = face_recognition.face_encodings(rgb_frame)
+        if not data:
+            return jsonify({"status": "error", "message": "No data received"})
 
-    if len(encodings) == 0:
-        return jsonify({"status": "No Face Found"}), 400
+        image_data = data.get("image")
 
-    unknown_encoding = encodings[0]
-    best_match_id = None
-    lowest_distance = 1.0
+        rgb_image = decode_image(image_data)
 
-    for student_id, stored_encoding in known_faces.items():
-        distance = face_recognition.face_distance([stored_encoding], unknown_encoding)[0]
-        if distance < lowest_distance:
-            lowest_distance = distance
-            best_match_id = student_id
+        if rgb_image is None:
+            return jsonify({"status": "error", "message": "Image decode failed"})
 
-    if best_match_id and lowest_distance < 0.45:
-        return jsonify({"status": "Match Found", "student_id": int(best_match_id)})
+        encodings = face_recognition.face_encodings(rgb_image)
 
-    return jsonify({"status": "No Match Found"})
+        print("👀 Recognition faces found:", len(encodings))
 
+        if len(encodings) == 0:
+            return jsonify({"status": "No Face Found"})
+
+        unknown_encoding = encodings[0]
+
+        best_match_id = None
+        lowest_distance = 1.0
+
+        # Compare with stored faces
+        for student_id, stored_encoding in known_faces.items():
+
+            distance = face_recognition.face_distance(
+                [stored_encoding],
+                unknown_encoding
+            )[0]
+
+            print(f"🔍 Checking {student_id} → Distance: {distance}")
+
+            if distance < lowest_distance:
+                lowest_distance = distance
+                best_match_id = student_id
+
+        # Threshold tuning
+        if lowest_distance < 0.45:
+            print("🎯 MATCH FOUND:", best_match_id)
+
+            return jsonify({
+                "status": "Match Found",
+                "student_id": int(best_match_id)
+            })
+
+        return jsonify({"status": "No Match Found"})
+
+    except Exception as e:
+        print("❌ Recognition error:", str(e))
+        return jsonify({"status": "error", "message": str(e)})
+
+
+# -----------------------------
+# HOME
+# -----------------------------
 @app.route("/")
 def home():
-    return "Face Server Running 🚀"
+    return "Smart Campus Face Recognition Backend Running 🚀"
 
-import os
 
+# -----------------------------
+# START SERVER
+# -----------------------------
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=5001)
+    print("🚀 Face Recognition Server Starting on port 5001...")
+    app.run(host="127.0.0.1", port=5001, debug=True)

@@ -1,62 +1,309 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Student Dashboard</title>
+
   <link rel="stylesheet" href="/style.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/feather-icons"></script>
 </head>
+
 <body>
 
-<div class="navbar">
-  <div>Smart Campus - Student</div>
-  <div>
-    Welcome <%= user.name %> |
-    <a href="/logout" style="color:white;">Logout</a>
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+
+  <div class="sidebar">
+
+    <div>
+
+      <div class="logo">
+        Smart Campus
+      </div>
+
+      <ul class="menu">
+
+        <li class="active" onclick="showSection('dashboard-section', this)">
+          <i data-feather="home"></i>
+          Dashboard
+        </li>
+
+        <li onclick="showSection('face-section', this)">
+          <i data-feather="camera"></i>
+          Face Attendance
+        </li>
+
+        <li onclick="showSection('attendance-section', this)">
+          <i data-feather="check-circle"></i>
+          Attendance
+        </li>
+
+        <li onclick="showSection('announcement-section', this)">
+          <i data-feather="bell"></i>
+          Announcements
+        </li>
+
+        <li onclick="showSection('profile-section', this)">
+          <i data-feather="user"></i>
+          Profile
+        </li>
+
+        <li onclick="showSection('geofence-section', this)">
+          <i data-feather="map-pin"></i>
+          Geofence
+        </li>
+
+      </ul>
+
+    </div>
+
+    <div class="logout-btn" onclick="window.location.href='/logout'">
+      <i data-feather="log-out"></i>
+      Logout
+    </div>
+
   </div>
+
+  <!-- MAIN CONTENT -->
+
+  <div class="main">
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+      <div>
+        <h1>Welcome, <%= user.name %> 👋</h1>
+        <p class="subtitle">
+          AI Smart Attendance Management System
+        </p>
+      </div>
+
+      <div class="profile-circle">
+        <%= user.name.charAt(0).toUpperCase() %>
+      </div>
+
+    </div>
+
+    <!-- DASHBOARD -->
+
+    <div id="dashboard-section" class="content-section active">
+
+      <div class="hero-card">
+
+        <div>
+
+          <h2>Smart Face Attendance</h2>
+
+          <p>
+            AI powered face recognition attendance with secure campus verification system.
+          </p>
+
+          <button class="hero-btn">
+            Attendance Active
+          </button>
+
+        </div>
+
+        <img src="https://cdn-icons-png.flaticon.com/512/4140/4140047.png">
+
+      </div>
+
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <h3>Total Classes</h3>
+          <h1><%= total %></h1>
+        </div>
+
+        <div class="stat-card">
+          <h3>Present Days</h3>
+          <h1><%= presentCount %></h1>
+        </div>
+
+        <div class="stat-card">
+          <h3>Attendance %</h3>
+          <h1><%= percentage %>%</h1>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- FACE SECTION -->
+
+    <div id="face-section" class="content-section">
+
+      <div class="camera-card">
+
+        <h2>Face Attendance</h2>
+
+        <video id="video" autoplay playsinline></video>
+
+        <div class="button-group">
+
+          <button onclick="registerFace()">
+            Register Face
+          </button>
+
+          <button onclick="markAttendance()">
+            Mark Attendance
+          </button>
+
+        </div>
+
+        <p id="result"></p>
+
+      </div>
+
+    </div>
+
+    <!-- ATTENDANCE SECTION -->
+
+    <div id="attendance-section" class="content-section">
+
+      <div class="table-card">
+
+        <h2>Attendance Records</h2>
+
+        <table>
+
+          <tr>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+
+          <% attendance.forEach(a => { %>
+
+          <tr>
+
+            <td><%= a.date.toDateString() %></td>
+
+            <td>
+              <span class="<%= a.status === 'Present' ? 'present' : 'absent' %>">
+                <%= a.status %>
+              </span>
+            </td>
+
+          </tr>
+
+          <% }) %>
+
+        </table>
+
+      </div>
+
+    </div>
+
+    <!-- ANNOUNCEMENTS -->
+
+    <div id="announcement-section" class="content-section">
+
+      <div class="announcement-card">
+
+        <h2>Latest Announcements</h2>
+
+        <% announcements.forEach(a => { %>
+
+        <div class="announcement-item">
+
+          <h3><%= a.title %></h3>
+
+          <p><%= a.message %></p>
+
+        </div>
+
+        <% }) %>
+
+      </div>
+
+    </div>
+
+    <!-- PROFILE -->
+
+    <div id="profile-section" class="content-section">
+
+      <div class="profile-card">
+
+        <h2>Student Profile</h2>
+
+        <div class="profile-details">
+
+          <p><strong>Name:</strong> <%= user.name %></p>
+
+          <p><strong>Student ID:</strong> <%= user.student_id %></p>
+
+          <p><strong>Role:</strong> <%= user.role %></p>
+
+          <p><strong>Attendance:</strong> <%= percentage %>%</p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- GEOFENCE -->
+
+    <div id="geofence-section" class="content-section">
+
+      <div class="geo-card">
+
+        <h2>Campus Geofence</h2>
+
+        <div class="geo-circle"></div>
+
+        <h3 id="geo-status">Checking Location...</h3>
+
+        <p>
+          Attendance allowed only inside campus.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
 </div>
 
-<div class="container">
+<script>
 
-  <div class="card">
-    <h3>Attendance Summary</h3>
-    <p>Total Classes: <%= total %></p>
-    <p>Present: <%= presentCount %></p>
-    <p>Attendance Percentage: <%= percentage %>%</p>
-  </div>
+feather.replace();
 
-  <div class="card">
-    <h3>Attendance Records</h3>
-    <% attendance.forEach(a => { %>
-      <p><%= a.date %> - <%= a.status %></p>
-    <% }) %>
-  </div>
-  
-  <div class="card">
-    <h3>Announcements</h3>
-    <% announcements.forEach(a => { %>
-      <p><strong><%= a.title %></strong> - <%= a.message %></p>
-    <% }) %>
-  </div>
-  <h3>Face Attendance</h3>
-  <button onclick="registerFace()">Register Face</button>
-  <button onclick="markAttendance()">Mark Attendance</button>
+/* SIDEBAR NAVIGATION */
 
-  <video id="video" width="400" autoplay></video>
-  <p id="result"></p>
+function showSection(sectionId, element){
 
-  <script src="/script.js"></script>
+  document.querySelectorAll(".content-section")
+  .forEach(section => {
+    section.classList.remove("active");
+  });
 
-  <script>
-    const video = document.getElementById("video");
+  document.getElementById(sectionId)
+  .classList.add("active");
 
-    navigator.mediaDevices.getUserMedia({ video: true })
-    .then(stream => {
-      video.srcObject = stream;
-    })
-    .catch(err => {
-      console.log("Camera error:", err);
-    });
+  document.querySelectorAll(".menu li")
+  .forEach(item => {
+    item.classList.remove("active");
+  });
+
+  element.classList.add("active");
+}
+
 </script>
-</div>
+<script src="/script.js"></script>
+<script>
+    feather.replace();
+    initCamera();
+</script>
 
 </body>
 </html>

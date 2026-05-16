@@ -6,23 +6,60 @@
 </head>
 <body>
 
-<div class="container">
-  <h2>Smart Campus Register</h2>
+<div class="auth-page">
 
-  <form action="/register" method="POST">
-    <input type="text" name="name" placeholder="Enter Name" required>
-    <input type="email" name="email" placeholder="Enter Email" required>
-    <input type="password" name="password" placeholder="Enter Password" required>
+  <div class="auth-left">
+    <h1>Smart Campus</h1>
 
-    <select name="role">
-      <option value="student">Student</option>
-      <option value="faculty">Faculty</option>
-    </select>
+    <p>
+      Create your account and access AI attendance,
+      announcements, geofence verification and more.
+    </p>
+  </div>
 
-    <button type="submit">Register</button>
-  </form>
+  <div class="auth-right">
 
-  <a href="/">Already have account? Login</a>
+    <div class="auth-box">
+
+      <h2>Create Account</h2>
+
+      <p>Register into Smart Campus</p>
+
+      <form action="/register" method="POST">
+
+        <div class="input-group">
+          <input type="text" name="name" placeholder="Full Name" required>
+        </div>
+
+        <div class="input-group">
+          <input type="text" name="student_id" placeholder="Student ID" required>
+        </div>
+
+        <div class="input-group">
+          <input type="password" name="password" placeholder="Password" required>
+        </div>
+
+        <div class="input-group">
+          <select name="role">
+            <option value="student">Student</option>
+            <option value="faculty">Faculty</option>
+          </select>
+        </div>
+
+        <button class="auth-btn" type="submit">
+          Register
+        </button>
+
+      </form>
+
+      <div class="auth-link">
+        <a href="/login">Already have account?</a>
+      </div>
+
+    </div>
+
+  </div>
+
 </div>
 
 </body>

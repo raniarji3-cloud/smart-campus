@@ -1,0 +1,5 @@
+node_modules/
+faceenv/
+faces.db
+debug_face.jpg
+.env
