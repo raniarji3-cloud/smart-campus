@@ -1,5 +1,6 @@
-node_modules/
 faceenv/
-faces.db
-debug_face.jpg
+__pycache__/
+*.pyc
 .env
+debug_face.jpg
+node_modules/
